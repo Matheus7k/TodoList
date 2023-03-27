@@ -1,6 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using TodoList;
+using static System.Reflection.Metadata.BlobBuilder;
 
 internal class Program
 {
@@ -10,14 +13,196 @@ internal class Program
         List<Category> categories = new();
         List<Person> persons = new();
 
-        AddOnFile(tasks);
+        tasks = LoadTasks(tasks);
+        categories = LoadCategories(categories);
+        persons = LoadPersons(persons);
 
-        Console.WriteLine("Hello, World!");
+        int op;
+
+        do
+        {
+            op = Menu();
+            switch (op)
+            {
+                case 1:
+                    Console.WriteLine("-----CADASTRAR PESSOA-----");
+                    persons.Add(CreatePerson());
+                    AddOnPersonFile(persons);
+                    break;
+                case 2:
+                    Console.Write("-----CADASTRAR CATEGORIA-----");
+                    categories.Add(CreateGategory());
+                    AddOnCategoryFile(categories);
+                    break;
+                case 3:
+                    Console.Write("-----CADASTRAR TAREFA-----");
+                    tasks.Add(CreateTodo(persons, categories));
+                    AddOnTasksFile(tasks);
+                    break;
+                case 4:
+                    
+                    break;
+                case 5:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Escolha uma opção valida!");
+                    break;
+            }
+        } while (true);
     }
 
-    private static void AddOnFile([Optional] List<Todo> tasks, [Optional] List<Category>? categories, [Optional] List<Person>? persons)
+    private static int Menu()
     {
+        Console.WriteLine($"----Todo List----" +
+                             $"\n1 - Adicionar pessoa" +
+                             $"\n2 - Adicionar categoria" +
+                             $"\n3 - Adicionar tarefa" +
+                             $"\n4 - Listar tarefas" +
+                             $"\n5 - Sair e salvar" +
+                             "\n-----------------------");
+        return int.Parse(Console.ReadLine());
+    }
 
+    private static Person CreatePerson()
+    {
+        Console.Write("\nInforme o nome da pessoa: ");
+        string name = Console.ReadLine();
+
+        return new Person(name);
+    }
+
+    private static Category CreateGategory()
+    {
+        Console.Write("\nInforme a nova categoria: ");
+        string category = Console.ReadLine();
+
+        return new Category(category);
+    }
+
+    private static Todo CreateTodo(List<Person> persons, List<Category> categories)
+    {
+        Console.WriteLine("Essa tarefa pertence a quem?");
+        Person personToTask = ListPersons(persons);
+
+        Console.Write("Descrição da tarefa: ");
+        string description = Console.ReadLine();
+
+        Console.WriteLine("Data do possivel término(dia/mes/ano hora/minuto): ");
+        DateTime duaDate = DateTime.Parse(Console.ReadLine());
+
+        Console.WriteLine("Essa tarefa é de qual categoria?");
+        Category categoryToTask = ListCategories(categories);
+
+        return new Todo(description, categoryToTask.CategoryName, personToTask, duaDate);
+    }
+
+    private static Person ListPersons(List<Person> persons)
+    {
+        Console.WriteLine("Pessoas cadastradas: ");
+        for (int i = 0; i < persons.Count; i++)
+        {
+            Console.WriteLine($"{i+1} - {persons[i].Name}");
+        }
+        int personOp = int.Parse(Console.ReadLine());
+
+        return persons[personOp - 1];
+    }
+
+    private static Category ListCategories(List<Category> categories)
+    {
+        Console.WriteLine("Categorias cadastradas: ");
+        for (int i = 0; i < categories.Count; i++)
+        {
+            Console.WriteLine($"{i + 1} - {categories[i].CategoryName}");
+        }
+        int categoryOp = int.Parse(Console.ReadLine());
+
+        return categories[categoryOp - 1];
+    }
+
+    private static void AddOnPersonFile(List<Person> persons)
+    {
+        try
+        {
+            if (File.Exists("persons.txt"))
+            {
+                StreamWriter sw = new("persons.txt");
+
+                foreach (var person in persons)
+                {
+                    sw.WriteLine(person.ToFile());
+                }
+
+                sw.Close();
+            }
+            else
+            {
+                StreamWriter sw = new("persons.txt");
+                sw.WriteLine();
+                sw.Close();
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+    private static void AddOnCategoryFile(List<Category> categories)
+    {
+        try
+        {
+            if (File.Exists("categories.txt"))
+            {
+                StreamWriter sw = new("categories.txt");
+
+                foreach (var category in categories)
+                {
+                    sw.WriteLine(category.ToFile());
+                }
+
+                sw.Close();
+            }
+            else
+            {
+                StreamWriter sw = new("categories.txt");
+                sw.WriteLine();
+                sw.Close();
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+    private static void AddOnTasksFile(List<Todo> tasks)
+    {
+        try
+        {
+            if (File.Exists("tasks.txt"))
+            {
+                StreamWriter sw = new("tasks.txt");
+
+                foreach (var task in tasks)
+                {
+                    sw.WriteLine(task.ToFile());
+                }
+
+                sw.Close();
+            }
+            else
+            {
+                StreamWriter sw = new("tasks.txt");
+                sw.WriteLine();
+                sw.Close();
+            }
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
     }
 
     private static List<Todo> LoadTasks(List<Todo> tasks)
@@ -34,11 +219,14 @@ internal class Program
 
                     Guid id = Guid.Parse(task[0]);
                     string description = task[1];
-                    DateTime created = Convert.ToDateTime(task[2]);
-                    DateTime dueDate = Convert.ToDateTime(task[3]);
-                    bool status = bool.Parse(task[4]);
+                    string category = task[2];
+                    string ownerName = task[3];
+                    Guid ownerId = Guid.Parse(task[4]);
+                    DateTime created = Convert.ToDateTime(task[5]);
+                    DateTime dueDate = Convert.ToDateTime(task[6]);
+                    bool status = bool.Parse(task[7]);
 
-                    tasks.Add(new Todo(id, description, created, dueDate, status));
+                    tasks.Add(new Todo(id, description, category, new Person(ownerId, ownerName), created, dueDate, status));
                 }
 
                 sr.Close();

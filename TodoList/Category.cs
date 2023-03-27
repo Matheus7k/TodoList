@@ -14,5 +14,10 @@ namespace TodoList
         {
             CategoryName = category;
         }
+
+        public string ToFile()
+        {
+            return $"{CategoryName};";
+        }
     }
 }
