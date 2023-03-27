@@ -23,10 +23,14 @@ namespace TodoList
             Name = name;
         }
 
-        public Person SetName(string name)
+        public void SetName(string name)
         {
             Name = name;
-            return this;
+        }
+
+        public string ToFile()
+        {
+            return $"{Id};{Name};";
         }
     }
 }
