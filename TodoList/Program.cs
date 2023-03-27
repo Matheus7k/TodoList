@@ -107,7 +107,7 @@ internal class Program
         Console.Write("Descrição da tarefa: ");
         string description = Console.ReadLine();
 
-        Console.WriteLine("Data do possivel término(dia/mes/ano hora/minuto): ");
+        Console.WriteLine("Data do possivel término(dia/mes/ano hora:minuto): ");
         DateTime duaDate = DateTime.Parse(Console.ReadLine());
 
         Console.WriteLine("Essa tarefa é de qual categoria?");
