@@ -19,5 +19,10 @@ namespace TodoList
         {
             return $"{CategoryName};";
         }
+
+        public override string ToString()
+        {
+            return "Categoria: " + this.CategoryName;
+        }
     }
 }

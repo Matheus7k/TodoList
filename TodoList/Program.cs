@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -40,16 +41,32 @@ internal class Program
                     AddOnTasksFile(tasks);
                     break;
                 case 4:
-                    
+                    Console.Clear();
+                    ShowTask(tasks);
+                    Console.ReadLine();
                     break;
                 case 5:
+                    Console.Clear();
+                    ShowCompletedTask(tasks);
+                    Console.ReadLine();
+                    break;
+                case 6:
+                    Console.Clear();
+                    Console.WriteLine("Informe o ID da tarefa: ");
+                    string id = Console.ReadLine();
+                    EndTask(tasks, id);
+                    break;
+                case 7:
+                    AddOnPersonFile(List < Person > persons);
+                    AddOnCategoryFile(List < Category > categories);
+                    AddOnTasksFile(List < Todo > tasks);
                     Environment.Exit(0);
                     break;
                 default:
                     Console.WriteLine("Escolha uma opção valida!");
                     break;
             }
-        } while (true);
+        } while (op != 7);
     }
 
     private static int Menu()
@@ -59,7 +76,9 @@ internal class Program
                              $"\n2 - Adicionar categoria" +
                              $"\n3 - Adicionar tarefa" +
                              $"\n4 - Listar tarefas" +
-                             $"\n5 - Sair e salvar" +
+                             $"\n5 - Listar tarefas finalizadas" +
+                             $"\n6 - Finalizar uma tarefa" +
+                             $"\n7 - Sair e salvar" +
                              "\n-----------------------");
         return int.Parse(Console.ReadLine());
     }
@@ -316,6 +335,40 @@ internal class Program
         catch (Exception ex)
         {
             throw;
+        }
+    }
+
+    private static void EndTask(List<Todo> tasks, string id)
+    {
+        foreach (ToDo tarefa in afazeres)
+        {
+            if (tarefa._id == id)
+            {
+                tarefa.Status = false;
+            }
+        }
+    }
+
+    private static void ShowTask(List<Todo> tasks)
+    {
+        foreach (ToDo tarefa in afazeres)
+        {
+            if (tarefa.Status == true)
+            {
+                Console.WriteLine(tarefa.ToString());
+            }
+
+        }
+    }
+
+    private static void ShowCompletedTask(List<Todo> tasks)
+    {
+        foreach (ToDo tarefa in afazeres)
+        {
+            if (tarefa.Status == false)
+            {
+                Console.WriteLine(tarefa.ToString());
+            }
         }
     }
 }

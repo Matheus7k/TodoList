@@ -32,5 +32,10 @@ namespace TodoList
         {
             return $"{Id};{Name};";
         }
+
+        public override string ToString()
+        {
+            return "ID: " + this.Id + "\nNome: " + this.Name + "\n";
+        }
     }
 }
