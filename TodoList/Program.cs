@@ -57,9 +57,9 @@ internal class Program
                     EndTask(tasks, id);
                     break;
                 case 7:
-                    AddOnPersonFile(List < Person > persons);
-                    AddOnCategoryFile(List < Category > categories);
-                    AddOnTasksFile(List < Todo > tasks);
+                    AddOnPersonFile(persons);
+                    AddOnCategoryFile(categories);
+                    AddOnTasksFile(tasks);
                     Environment.Exit(0);
                     break;
                 default:
@@ -77,7 +77,7 @@ internal class Program
                              $"\n3 - Adicionar tarefa" +
                              $"\n4 - Listar tarefas" +
                              $"\n5 - Listar tarefas finalizadas" +
-                             $"\n6 - Finalizar uma tarefa" +
+                             $"\n6 - Finalizar ou retornar uma tarefa" +
                              $"\n7 - Sair e salvar" +
                              "\n-----------------------");
         return int.Parse(Console.ReadLine());
@@ -232,23 +232,23 @@ internal class Program
             {
                 StreamReader sr = new("tasks.txt");
 
-                while(!sr.EndOfStream)
+                do
                 {
-                    string[] task = sr.ReadToEnd().Split(';');
+                    string[] task = sr.ReadLine().Split(';');
 
-                    Guid id = Guid.Parse(task[0]);
+                    string id = task[0];
                     string description = task[1];
                     string category = task[2];
                     string ownerName = task[3];
-                    Guid ownerId = Guid.Parse(task[4]);
+                    string ownerId =task[4];
                     DateTime created = Convert.ToDateTime(task[5]);
                     DateTime dueDate = Convert.ToDateTime(task[6]);
                     bool status = bool.Parse(task[7]);
 
                     tasks.Add(new Todo(id, description, category, new Person(ownerId, ownerName), created, dueDate, status));
-                }
+                } while (!sr.EndOfStream);
 
-                sr.Close();
+                    sr.Close();
 
                 return tasks;
             }
@@ -276,7 +276,7 @@ internal class Program
 
                 while (!sr.EndOfStream)
                 {
-                    string[] category = sr.ReadToEnd().Split(';');
+                    string[] category = sr.ReadLine().Split(';');
 
                     string categotyName = category[0];
 
@@ -311,9 +311,9 @@ internal class Program
 
                 while (!sr.EndOfStream)
                 {
-                    string[] person = sr.ReadToEnd().Split(';');
+                    string[] person = sr.ReadLine().Split(';');
 
-                    Guid id = Guid.Parse(person[0]);
+                    string id = person[0];
                     string personName = person[1];
 
                     persons.Add(new Person(id, personName));
@@ -340,22 +340,22 @@ internal class Program
 
     private static void EndTask(List<Todo> tasks, string id)
     {
-        foreach (ToDo tarefa in afazeres)
+        foreach (Todo tarefa in tasks)
         {
-            if (tarefa._id == id)
+            if (tarefa.Id == id)
             {
-                tarefa.Status = false;
+                tarefa.SetStatus();
             }
         }
     }
 
     private static void ShowTask(List<Todo> tasks)
     {
-        foreach (ToDo tarefa in afazeres)
+        foreach (Todo task in tasks)
         {
-            if (tarefa.Status == true)
+            if (task.Status == false)
             {
-                Console.WriteLine(tarefa.ToString());
+                Console.WriteLine(task.ToString());
             }
 
         }
@@ -363,11 +363,11 @@ internal class Program
 
     private static void ShowCompletedTask(List<Todo> tasks)
     {
-        foreach (ToDo tarefa in afazeres)
+        foreach (Todo task in tasks)
         {
-            if (tarefa.Status == false)
+            if (task.Status == true)
             {
-                Console.WriteLine(tarefa.ToString());
+                Console.WriteLine(task.ToString());
             }
         }
     }
